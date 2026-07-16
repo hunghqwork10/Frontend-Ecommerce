@@ -21,7 +21,7 @@ const mockProducts: Product[] = [
     price: 34990000,
     originalPrice: 39990000,
     discount: 13,
-    images: ['/placeholder.jpg'],
+    images: ['https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800'],
     brand: 'Apple',
     category: { id: '1', name: 'Laptop', slug: 'laptop' },
     stock: 10,
