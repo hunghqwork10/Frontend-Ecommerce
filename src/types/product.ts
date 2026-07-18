@@ -34,6 +34,8 @@ export interface ProductFilter {
   minRating?: number;
   search?: string;
   sortBy?: 'newest' | 'price_asc' | 'price_desc' | 'rating' | 'best_selling';
+  page?: number;
+  pageSize?: number;
 }
 
 export interface ProductListResponse {

@@ -13,6 +13,8 @@ export const productService = {
     if (filter.minRating) params.append('minRating', filter.minRating.toString());
     if (filter.search) params.append('search', filter.search);
     if (filter.sortBy) params.append('sortBy', filter.sortBy);
+    if (filter.page) params.append('page', filter.page.toString());
+    if (filter.pageSize) params.append('pageSize', filter.pageSize.toString());
     
     const response = await api.get<ProductListResponse>(`/products?${params}`);
     return response.data;

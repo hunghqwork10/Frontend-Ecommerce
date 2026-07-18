@@ -1,42 +1,28 @@
 import { ArrowRight } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import CategoryCard from '@/components/common/CategoryCard';
 import ProductCard from '@/components/common/ProductCard';
 import Button from '@/components/common/Button';
-import type { Product, Category } from '@/types';
+import { productService } from '@/services';
 
-// Mock data - sẽ thay bằng API call sau
-const mockCategories: Category[] = [
-  { id: '1', name: 'Laptop', slug: 'laptop', image: '' },
-  { id: '2', name: 'Điện thoại', slug: 'phone', image: '' },
-  { id: '3', name: 'Tablet', slug: 'tablet', image: '' },
-  { id: '4', name: 'Phụ kiện', slug: 'accessories', image: '' },
-];
-
-const mockProducts: Product[] = [
-  {
-    id: '1',
-    name: 'MacBook Pro 14 M3',
-    slug: 'macbook-pro-14-m3',
-    description: 'Laptop mạnh mẽ với chip M3',
-    price: 34990000,
-    originalPrice: 39990000,
-    discount: 13,
-    images: ['https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800'],
-    brand: 'Apple',
-    category: { id: '1', name: 'Laptop', slug: 'laptop' },
-    stock: 10,
-    sold: 50,
-    rating: 4.8,
-    reviewCount: 120,
-    specifications: {},
-    warranty: '12 tháng',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  // Thêm thêm sản phẩm mock...
+const categories = [
+  { id: '1', name: 'Laptop', slug: 'laptop' },
+  { id: '2', name: 'Điện thoại', slug: 'phone' },
+  { id: '3', name: 'Tablet', slug: 'tablet' },
+  { id: '4', name: 'Phụ kiện', slug: 'accessories' },
 ];
 
 export default function Home() {
+  const { data: bestSellers } = useQuery({
+    queryKey: ['products', { sortBy: 'best_selling' }],
+    queryFn: () => productService.getProducts({ sortBy: 'best_selling', pageSize: 8 }),
+  });
+
+  const { data: newProducts } = useQuery({
+    queryKey: ['products', { sortBy: 'newest' }],
+    queryFn: () => productService.getProducts({ sortBy: 'newest', pageSize: 8 }),
+  });
+
   return (
     <div className="min-h-screen">
       {/* Banner Section */}
@@ -61,7 +47,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold mb-6">Danh mục nổi bật</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {mockCategories.map((category) => (
+            {categories.map((category) => (
               <CategoryCard key={category.id} category={category} />
             ))}
           </div>
@@ -78,7 +64,7 @@ export default function Home() {
             </Button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {mockProducts.map((product) => (
+            {bestSellers?.products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
@@ -95,7 +81,7 @@ export default function Home() {
             </Button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {mockProducts.map((product) => (
+            {newProducts?.products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

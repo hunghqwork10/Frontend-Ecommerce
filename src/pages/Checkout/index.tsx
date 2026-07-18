@@ -1,91 +1,43 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import CheckoutForm from '@/components/common/CheckoutForm';
 import PaymentMethod from '@/components/common/PaymentMethod';
 import OrderSummary from '@/components/common/OrderSummary';
 import Button from '@/components/common/Button';
-import type { CartItem } from '@/types';
-
-// Mock cart data - sẽ thay bằng cart store sau
-const mockCartItems: CartItem[] = [
-  {
-    id: '1',
-    product: {
-      id: '1',
-      name: 'MacBook Pro 14 M3',
-      slug: 'macbook-pro-14-m3',
-      description: 'Laptop mạnh mẽ với chip M3',
-      price: 34990000,
-      originalPrice: 39990000,
-      discount: 13,
-      images: ['https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800'],
-      brand: 'Apple',
-      category: { id: '1', name: 'Laptop', slug: 'laptop' },
-      stock: 10,
-      sold: 50,
-      rating: 4.8,
-      reviewCount: 120,
-      specifications: {},
-      warranty: '12 tháng',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    quantity: 2,
-    price: 34990000,
-  },
-  {
-    id: '2',
-    product: {
-      id: '2',
-      name: 'iPhone 15 Pro Max',
-      slug: 'iphone-15-pro-max',
-      description: 'Điện thoại flagship của Apple',
-      price: 28990000,
-      originalPrice: 31990000,
-      discount: 9,
-      images: ['https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800'],
-      brand: 'Apple',
-      category: { id: '2', name: 'Điện thoại', slug: 'phone' },
-      stock: 20,
-      sold: 100,
-      rating: 4.9,
-      reviewCount: 250,
-      specifications: {},
-      warranty: '12 tháng',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    quantity: 1,
-    price: 28990000,
-  },
-];
+import { cartService, orderService } from '@/services';
 
 export default function Checkout() {
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'card' | 'wallet'>('cod');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const subtotal = mockCartItems.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
-    0
-  );
+  const { data: cart } = useQuery({
+    queryKey: ['cart'],
+    queryFn: cartService.getCart,
+  });
+
+  const createOrderMutation = useMutation({
+    mutationFn: orderService.createOrder,
+    onSuccess: (order) => {
+      navigate('/order-success', { state: { orderId: order.orderNumber } });
+    },
+  });
+
+  const items = cart?.items ?? [];
+  const subtotal = cart?.totalAmount ?? 0;
   const shipping = subtotal > 5000000 ? 0 : 30000;
-  const discount = mockCartItems.reduce(
-    (sum, item) => sum + (item.product.originalPrice ? (item.product.originalPrice - item.product.price) * item.quantity : 0),
-    0
-  );
-  const total = subtotal + shipping - discount;
+  const discount = cart?.discountAmount ?? 0;
+  const total = cart?.finalAmount ?? 0;
 
   const handleFormSubmit = () => {
-    setIsSubmitting(true);
-
-    // TODO: Call API to create order
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      navigate('/order-success', { state: { orderId: 'ORD123456' } });
-    }, 2000);
+    createOrderMutation.mutate({
+      items: items.map((item) => ({
+        productId: item.product.id,
+        quantity: item.quantity,
+      })),
+      shippingAddressId: 'addr-1',
+      paymentMethod: paymentMethod === 'card' ? 'credit_card' : paymentMethod as 'cod' | 'momo',
+    });
   };
 
   return (
@@ -108,7 +60,7 @@ export default function Checkout() {
           {/* Right Column - Order Summary */}
           <div className="lg:col-span-1">
             <OrderSummary
-              items={mockCartItems}
+              items={items}
               subtotal={subtotal}
               shipping={shipping}
               discount={discount}
@@ -118,7 +70,7 @@ export default function Checkout() {
             <Button
               size="lg"
               className="w-full mt-6"
-              isLoading={isSubmitting}
+              isLoading={createOrderMutation.isPending}
               onClick={() => {
                 const form = document.querySelector('form');
                 if (form) form.requestSubmit();
