@@ -12,7 +12,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
   
   // Hiển thị tối đa 5 trang
   let startPage = Math.max(1, currentPage - 2);
-  let endPage = Math.min(totalPages, startPage + 4);
+  const endPage = Math.min(totalPages, startPage + 4);
   
   if (endPage - startPage < 4) {
     startPage = Math.max(1, endPage - 4);

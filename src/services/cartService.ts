@@ -1,5 +1,5 @@
 import api from './api';
-import type { Cart, CartItem, AddToCartRequest, UpdateCartItemRequest } from '@/types';
+import type { Cart, AddToCartRequest, UpdateCartItemRequest } from '@/types';
 
 export const cartService = {
   // Lấy giỏ hàng

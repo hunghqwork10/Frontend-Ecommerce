@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, Heart, Share2 } from 'lucide-react';
 import Button from './Button';
 import type { Product } from '@/types';
@@ -9,6 +10,7 @@ interface ProductInfoProps {
 }
 
 export default function ProductInfo({ product, onAddToCart }: ProductInfoProps) {
+  const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -27,8 +29,7 @@ export default function ProductInfo({ product, onAddToCart }: ProductInfoProps) 
 
   const handleBuyNow = () => {
     onAddToCart(product.id, quantity);
-    // Navigate to checkout
-    window.location.href = '/checkout';
+    navigate('/checkout');
   };
 
   return (

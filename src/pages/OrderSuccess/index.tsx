@@ -1,9 +1,16 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { CheckCircle, ShoppingBag } from 'lucide-react';
 import Button from '@/components/common/Button';
 
+interface LocationState {
+  orderId?: string;
+}
+
 export default function OrderSuccess() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state as LocationState | null;
+  const orderId = state?.orderId ?? 'N/A';
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -24,7 +31,7 @@ export default function OrderSuccess() {
         <div className="bg-gray-50 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-center gap-2 text-gray-600">
             <ShoppingBag className="w-5 h-5" />
-            <span className="font-medium">Mã đơn hàng: #ORD123456</span>
+            <span className="font-medium">Mã đơn hàng: #{orderId}</span>
           </div>
         </div>
 

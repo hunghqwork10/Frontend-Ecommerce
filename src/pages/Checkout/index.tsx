@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import CheckoutForm, { type CheckoutFormData } from '@/components/common/CheckoutForm';
+import CheckoutForm from '@/components/common/CheckoutForm';
 import PaymentMethod from '@/components/common/PaymentMethod';
 import OrderSummary from '@/components/common/OrderSummary';
 import Button from '@/components/common/Button';
@@ -76,21 +76,15 @@ export default function Checkout() {
   );
   const total = subtotal + shipping - discount;
 
-  const handleFormSubmit = (formData: CheckoutFormData) => {
+  const handleFormSubmit = () => {
     setIsSubmitting(true);
 
     // TODO: Call API to create order
-    console.log('Order data:', {
-      ...formData,
-      paymentMethod,
-      items: mockCartItems,
-      total,
-    });
 
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
-      navigate('/order-success');
+      navigate('/order-success', { state: { orderId: 'ORD123456' } });
     }, 2000);
   };
 

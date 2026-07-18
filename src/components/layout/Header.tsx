@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 import { ShoppingCart, User } from "lucide-react";
+import { useCartStore } from "@/stores/cartStore";
 
 export default function Header() {
+  const cart = useCartStore((s) => s.cart);
+  const itemCount = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
   return (
     <header className="w-full shadow-sm border-b bg-white">
       {/* Top Bar */}
@@ -50,9 +53,11 @@ export default function Header() {
           {/* Cart */}
           <Link to="/cart" className="relative">
             <ShoppingCart className="w-6 h-6" />
-            <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-1.5 rounded-full">
-              0
-            </span>
+            {itemCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-1.5 rounded-full">
+                {itemCount}
+              </span>
+            )}
           </Link>
 
           {/* User */}

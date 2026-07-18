@@ -1,4 +1,3 @@
-import { useParams } from 'react-router-dom';
 import ImageGallery from '@/components/common/ImageGallery';
 import ProductInfo from '@/components/common/ProductInfo';
 import ProductReviews from '@/components/common/ProductReviews';
@@ -61,10 +60,7 @@ const mockReviews = [
 ];
 
 export default function ProductDetail() {
-    const { id } = useParams<{ id: string }>();
-
-    const handleAddToCart = (productId: string, quantity: number) => {
-        console.log('Add to cart:', productId, quantity);
+    const handleAddToCart = () => {
         // TODO: Call cart service
     };
 
