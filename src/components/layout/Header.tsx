@@ -1,5 +1,6 @@
-import { Link } from "react-router-dom";
-import { ShoppingCart, User, LogOut } from "lucide-react";
+import { useState } from 'react';
+import { Link, useNavigate } from "react-router-dom";
+import { ShoppingCart, User, LogOut, Search } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { useUserStore } from "@/stores/userStore";
 
@@ -8,6 +9,8 @@ export default function Header() {
   const itemCount = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
   const user = useUserStore((s) => s.user);
   const logout = useUserStore((s) => s.logout);
+  const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState('');
   return (
     <header className="w-full shadow-sm border-b bg-white">
       {/* Top Bar */}
@@ -47,11 +50,29 @@ export default function Header() {
         {/* Actions */}
         <div className="flex items-center gap-4">
           {/* Search */}
-          <input
-            type="text"
-            placeholder="Tìm sản phẩm..."
-            className="hidden md:block border rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (searchValue.trim()) {
+                navigate(`/products?search=${encodeURIComponent(searchValue.trim())}`);
+              }
+            }}
+            className="hidden md:flex items-center"
+          >
+            <input
+              type="text"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              placeholder="Tìm sản phẩm..."
+              className="border rounded-l-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-3 py-1 rounded-r-lg hover:bg-blue-700"
+            >
+              <Search className="w-4 h-4" />
+            </button>
+          </form>
 
           {/* Cart */}
           <Link to="/cart" className="relative">

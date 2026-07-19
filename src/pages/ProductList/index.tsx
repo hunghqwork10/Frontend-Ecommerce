@@ -11,9 +11,11 @@ import type { ProductFilter as ProductFilterType } from '@/types';
 export default function ProductList() {
   const [searchParams] = useSearchParams();
   const category = searchParams.get('category');
+  const search = searchParams.get('search');
 
   const [filter, setFilter] = useState<ProductFilterType>({
     category: category || undefined,
+    search: search || undefined,
   });
   const [sortBy, setSortBy] = useState<string>('newest');
   const [currentPage, setCurrentPage] = useState(1);
@@ -46,7 +48,11 @@ export default function ProductList() {
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-4">
           <h1 className="text-2xl font-bold">
-            {category ? `Danh mục: ${category}` : 'Tất cả sản phẩm'}
+            {search
+              ? `Kết quả tìm kiếm: "${search}"`
+              : category
+                ? `Danh mục: ${category}`
+                : 'Tất cả sản phẩm'}
           </h1>
         </div>
       </div>
