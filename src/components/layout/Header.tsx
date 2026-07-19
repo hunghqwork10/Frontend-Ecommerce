@@ -1,10 +1,13 @@
 import { Link } from "react-router-dom";
-import { ShoppingCart, User } from "lucide-react";
+import { ShoppingCart, User, LogOut } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
+import { useUserStore } from "@/stores/userStore";
 
 export default function Header() {
   const cart = useCartStore((s) => s.cart);
   const itemCount = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
+  const user = useUserStore((s) => s.user);
+  const logout = useUserStore((s) => s.logout);
   return (
     <header className="w-full shadow-sm border-b bg-white">
       {/* Top Bar */}
@@ -61,9 +64,18 @@ export default function Header() {
           </Link>
 
           {/* User */}
-          <Link to="/login">
-            <User className="w-6 h-6" />
-          </Link>
+          {user ? (
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium hidden md:block">{user.name}</span>
+              <button onClick={logout} className="text-gray-500 hover:text-red-600" title="Đăng xuất">
+                <LogOut className="w-6 h-6" />
+              </button>
+            </div>
+          ) : (
+            <Link to="/login">
+              <User className="w-6 h-6" />
+            </Link>
+          )}
         </div>
       </div>
     </header>

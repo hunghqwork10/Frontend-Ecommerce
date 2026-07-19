@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { User } from '@/types';
+import { authService } from '@/services';
 
 interface UserStore {
   user: User | null;
@@ -8,9 +9,10 @@ interface UserStore {
   setUser: (user: User) => void;
   setToken: (token: string) => void;
   logout: () => void;
+  fetchProfile: () => Promise<void>;
 }
 
-export const useUserStore = create<UserStore>((set) => ({
+export const useUserStore = create<UserStore>((set, get) => ({
   user: null,
   token: localStorage.getItem('token'),
   isLoading: false,
@@ -21,6 +23,19 @@ export const useUserStore = create<UserStore>((set) => ({
   },
   logout: () => {
     localStorage.removeItem('token');
+    authService.logout().catch(() => {});
     set({ user: null, token: null });
+  },
+  fetchProfile: async () => {
+    const token = get().token;
+    if (!token) return;
+    set({ isLoading: true });
+    try {
+      const user = await authService.getProfile();
+      set({ user, isLoading: false });
+    } catch {
+      localStorage.removeItem('token');
+      set({ user: null, token: null, isLoading: false });
+    }
   },
 }));
