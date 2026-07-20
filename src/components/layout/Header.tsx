@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, User, LogOut, Search } from "lucide-react";
+import { ShoppingCart, User, LogOut, Search, Package } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { useUserStore } from "@/stores/userStore";
 
@@ -86,7 +86,10 @@ export default function Header() {
 
           {/* User */}
           {user ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              <Link to="/orders" className="text-gray-600 hover:text-blue-600" title="Đơn hàng của tôi">
+                <Package className="w-6 h-6" />
+              </Link>
               <span className="text-sm font-medium hidden md:block">{user.name}</span>
               <button onClick={logout} className="text-gray-500 hover:text-red-600" title="Đăng xuất">
                 <LogOut className="w-6 h-6" />

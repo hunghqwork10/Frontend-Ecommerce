@@ -1,6 +1,7 @@
 import { http, HttpResponse, delay } from 'msw';
 import { mockProducts } from './data/products';
 import { mockUsers } from './data/users';
+import { mockOrders } from './data/orders';
 import type { Cart, Product, ProductListResponse } from '@/types';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
@@ -326,161 +327,29 @@ export const handlers = [
     const page = parseInt(url.searchParams.get('page') || '1');
     const pageSize = 10;
 
-    const mockOrders = [
-      {
-        id: 'order-1',
-        orderNumber: 'ORD001',
-        userId: '1',
-        user: mockUsers[0],
-        items: [
-          {
-            id: 'oi-1',
-            productId: '1',
-            productName: 'MacBook Pro 14 M3',
-            productImage: mockProducts[0].images[0],
-            price: 34990000,
-            quantity: 1,
-            total: 34990000,
-          },
-        ],
-        shippingAddress: {
-          id: 'addr-1',
-          userId: '1',
-          fullName: 'Nguyễn Văn A',
-          phone: '0901234567',
-          province: 'TP. Hồ Chí Minh',
-          district: 'Quận 1',
-          ward: 'Phường Bến Nghé',
-          street: '123 Đường Lê Lợi',
-          isDefault: true,
-        },
-        paymentMethod: 'cod' as const,
-        paymentStatus: 'pending' as const,
-        status: 'pending' as const,
-        subtotal: 34990000,
-        shippingFee: 0,
-        discountAmount: 0,
-        totalAmount: 34990000,
-        createdAt: '2024-01-15T10:30:00Z',
-        updatedAt: '2024-01-15T10:30:00Z',
-      },
-      {
-        id: 'order-2',
-        orderNumber: 'ORD002',
-        userId: '1',
-        user: mockUsers[0],
-        items: [
-          {
-            id: 'oi-2',
-            productId: '2',
-            productName: 'iPhone 15 Pro Max',
-            productImage: mockProducts[1].images[0],
-            price: 28990000,
-            quantity: 1,
-            total: 28990000,
-          },
-        ],
-        shippingAddress: {
-          id: 'addr-1',
-          userId: '1',
-          fullName: 'Nguyễn Văn A',
-          phone: '0901234567',
-          province: 'TP. Hồ Chí Minh',
-          district: 'Quận 1',
-          ward: 'Phường Bến Nghé',
-          street: '123 Đường Lê Lợi',
-          isDefault: true,
-        },
-        paymentMethod: 'bank_transfer' as const,
-        paymentStatus: 'paid' as const,
-        status: 'delivered' as const,
-        subtotal: 28990000,
-        shippingFee: 0,
-        discountAmount: 0,
-        totalAmount: 28990000,
-        createdAt: '2024-01-10T14:20:00Z',
-        updatedAt: '2024-01-12T09:00:00Z',
-      },
-    ];
-
     const { data, total } = paginate(mockOrders, page, pageSize);
     return HttpResponse.json({ orders: data, total });
   }),
 
   http.get(`${API_BASE}/orders/:id`, async ({ params }) => {
     await delay(200);
-    if (params.id === 'order-1') {
-      return HttpResponse.json({
-        id: 'order-1',
-        orderNumber: 'ORD001',
-        userId: '1',
-        user: mockUsers[0],
-        items: [
-          {
-            id: 'oi-1',
-            productId: '1',
-            productName: 'MacBook Pro 14 M3',
-            productImage: mockProducts[0].images[0],
-            price: 34990000,
-            quantity: 1,
-            total: 34990000,
-          },
-        ],
-        shippingAddress: {
-          id: 'addr-1',
-          userId: '1',
-          fullName: 'Nguyễn Văn A',
-          phone: '0901234567',
-          province: 'TP. Hồ Chí Minh',
-          district: 'Quận 1',
-          ward: 'Phường Bến Nghé',
-          street: '123 Đường Lê Lợi',
-          isDefault: true,
-        },
-        paymentMethod: 'cod',
-        paymentStatus: 'pending',
-        status: 'pending',
-        subtotal: 34990000,
-        shippingFee: 0,
-        discountAmount: 0,
-        totalAmount: 34990000,
-        createdAt: '2024-01-15T10:30:00Z',
-        updatedAt: '2024-01-15T10:30:00Z',
-      });
+    const order = mockOrders.find((o) => o.id === params.id);
+    if (order) {
+      return HttpResponse.json(order);
     }
     return HttpResponse.json({ message: 'Đơn hàng không tồn tại' }, { status: 404 });
   }),
 
   http.patch(`${API_BASE}/orders/:id/cancel`, async ({ params }) => {
     await delay(300);
-    if (params.id === 'order-1') {
-      return HttpResponse.json({
-        id: 'order-1',
-        orderNumber: 'ORD001',
-        userId: '1',
-        user: mockUsers[0],
-        items: [],
-        shippingAddress: {
-          id: 'addr-1',
-          userId: '1',
-          fullName: 'Nguyễn Văn A',
-          phone: '0901234567',
-          province: 'TP. Hồ Chí Minh',
-          district: 'Quận 1',
-          ward: 'Phường Bến Nghé',
-          street: '123 Đường Lê Lợi',
-          isDefault: true,
-        },
-        paymentMethod: 'cod',
-        paymentStatus: 'pending',
+    const orderIndex = mockOrders.findIndex((o) => o.id === params.id);
+    if (orderIndex !== -1) {
+      mockOrders[orderIndex] = {
+        ...mockOrders[orderIndex],
         status: 'cancelled',
-        subtotal: 34990000,
-        shippingFee: 0,
-        discountAmount: 0,
-        totalAmount: 34990000,
-        createdAt: '2024-01-15T10:30:00Z',
         updatedAt: new Date().toISOString(),
-      });
+      };
+      return HttpResponse.json(mockOrders[orderIndex]);
     }
     return HttpResponse.json({ message: 'Đơn hàng không tồn tại' }, { status: 404 });
   }),
