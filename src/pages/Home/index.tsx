@@ -2,6 +2,7 @@ import { ArrowRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import CategoryCard from '@/components/common/CategoryCard';
 import ProductCard from '@/components/common/ProductCard';
+import { ProductCardSkeleton } from '@/components/common/Skeleton';
 import Button from '@/components/common/Button';
 import { productService } from '@/services';
 
@@ -67,6 +68,9 @@ export default function Home() {
             {bestSellers?.products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
+            {!bestSellers && Array.from({ length: 4 }).map((_, i) => (
+              <ProductCardSkeleton key={`skel-best-${i}`} />
+            ))}
           </div>
         </div>
       </section>
@@ -83,6 +87,9 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {newProducts?.products.map((product) => (
               <ProductCard key={product.id} product={product} />
+            ))}
+            {!newProducts && Array.from({ length: 4 }).map((_, i) => (
+              <ProductCardSkeleton key={`skel-new-${i}`} />
             ))}
           </div>
         </div>

@@ -5,6 +5,7 @@ import ProductCard from '@/components/common/ProductCard';
 import ProductFilter from '@/components/common/ProductFilter';
 import ProductSort from '@/components/common/ProductSort';
 import Pagination from '@/components/common/Pagination';
+import { ProductCardSkeleton } from '@/components/common/Skeleton';
 import { productService } from '@/services';
 import type { ProductFilter as ProductFilterType } from '@/types';
 
@@ -76,7 +77,11 @@ export default function ProductList() {
 
             {/* Products Grid */}
             {isLoading ? (
-              <div className="text-center py-12 text-gray-500">Đang tải...</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <ProductCardSkeleton key={`skel-${i}`} />
+                ))}
+              </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {data?.products.map((product) => (

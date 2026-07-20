@@ -5,6 +5,7 @@ import ProductInfo from '@/components/common/ProductInfo';
 import ProductReviews from '@/components/common/ProductReviews';
 import ProductCard from '@/components/common/ProductCard';
 import { productService, cartService } from '@/services';
+import { ProductDetailSkeleton } from '@/components/common/Skeleton';
 
 export default function ProductDetail() {
     const { id } = useParams<{ id: string }>();
@@ -35,8 +36,15 @@ export default function ProductDetail() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <p className="text-gray-500">Đang tải...</p>
+            <div className="min-h-screen bg-gray-50">
+                <div className="bg-white border-b">
+                    <div className="container mx-auto px-4 py-4">
+                        <div className="h-5 bg-gray-200 rounded w-64 animate-shimmer" />
+                    </div>
+                </div>
+                <div className="container mx-auto px-4 py-8">
+                    <ProductDetailSkeleton />
+                </div>
             </div>
         );
     }

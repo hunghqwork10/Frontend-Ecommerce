@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import CartItem from '@/components/common/CartItem';
 import CartSummary from '@/components/common/CartSummary';
 import Button from '@/components/common/Button';
+import { CartItemSkeleton } from '@/components/common/Skeleton';
 import { cartService } from '@/services';
 
 export default function Cart() {
@@ -44,8 +45,29 @@ export default function Cart() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-500">Đang tải giỏ hàng...</p>
+      <div className="min-h-screen bg-gray-50">
+        <div className="bg-white border-b">
+          <div className="container mx-auto px-4 py-4">
+            <h1 className="text-2xl font-bold">Giỏ hàng</h1>
+          </div>
+        </div>
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <CartItemSkeleton key={`skel-${i}`} />
+              ))}
+            </div>
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
+                <div className="h-5 bg-gray-200 rounded w-32 animate-shimmer" />
+                <div className="h-4 bg-gray-200 rounded w-full animate-shimmer" />
+                <div className="h-4 bg-gray-200 rounded w-3/4 animate-shimmer" />
+                <div className="h-10 bg-gray-200 rounded w-full animate-shimmer" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
