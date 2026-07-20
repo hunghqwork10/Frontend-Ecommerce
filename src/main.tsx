@@ -4,6 +4,8 @@ import './index.css';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './routes/index.tsx';
 import QueryProvider from './providers/QueryProvider.tsx';
+import ErrorBoundary from './components/common/ErrorBoundary';
+import ToastContainer from './components/common/Toast';
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -15,9 +17,12 @@ async function enableMocking() {
 enableMocking().then(() => {
   createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-      <QueryProvider>
-        <RouterProvider router={router} />
-      </QueryProvider>
+      <ErrorBoundary>
+        <QueryProvider>
+          <RouterProvider router={router} />
+        </QueryProvider>
+        <ToastContainer />
+      </ErrorBoundary>
     </React.StrictMode>
   )
 })

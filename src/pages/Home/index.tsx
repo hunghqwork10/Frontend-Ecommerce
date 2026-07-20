@@ -14,12 +14,12 @@ const categories = [
 ];
 
 export default function Home() {
-  const { data: bestSellers } = useQuery({
+  const { data: bestSellers, error: bestSellersError } = useQuery({
     queryKey: ['products', { sortBy: 'best_selling' }],
     queryFn: () => productService.getProducts({ sortBy: 'best_selling', pageSize: 8 }),
   });
 
-  const { data: newProducts } = useQuery({
+  const { data: newProducts, error: newProductsError } = useQuery({
     queryKey: ['products', { sortBy: 'newest' }],
     queryFn: () => productService.getProducts({ sortBy: 'newest', pageSize: 8 }),
   });
@@ -65,10 +65,12 @@ export default function Home() {
             </Button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {bestSellers?.products.map((product) => (
+            {bestSellersError ? (
+              <p className="col-span-full text-center text-red-500 py-8">Không thể tải sản phẩm bán chạy.</p>
+            ) : bestSellers?.products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
-            {!bestSellers && Array.from({ length: 4 }).map((_, i) => (
+            {!bestSellers && !bestSellersError && Array.from({ length: 4 }).map((_, i) => (
               <ProductCardSkeleton key={`skel-best-${i}`} />
             ))}
           </div>
@@ -85,10 +87,12 @@ export default function Home() {
             </Button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {newProducts?.products.map((product) => (
+            {newProductsError ? (
+              <p className="col-span-full text-center text-red-500 py-8">Không thể tải sản phẩm mới.</p>
+            ) : newProducts?.products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
-            {!newProducts && Array.from({ length: 4 }).map((_, i) => (
+            {!newProducts && !newProductsError && Array.from({ length: 4 }).map((_, i) => (
               <ProductCardSkeleton key={`skel-new-${i}`} />
             ))}
           </div>

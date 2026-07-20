@@ -10,7 +10,7 @@ export default function Cart() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { data: cart, isLoading } = useQuery({
+  const { data: cart, isLoading, error } = useQuery({
     queryKey: ['cart'],
     queryFn: cartService.getCart,
   });
@@ -67,6 +67,19 @@ export default function Cart() {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">Không thể tải giỏ hàng.</p>
+          <button onClick={() => window.location.reload()} className="text-blue-600 hover:underline">
+            Thử lại
+          </button>
         </div>
       </div>
     );

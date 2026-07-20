@@ -11,7 +11,7 @@ export default function ProductDetail() {
     const { id } = useParams<{ id: string }>();
     const queryClient = useQueryClient();
 
-    const { data: product, isLoading } = useQuery({
+    const { data: product, isLoading, error } = useQuery({
         queryKey: ['product', id],
         queryFn: () => productService.getProductById(id!),
         enabled: !!id,
@@ -44,6 +44,19 @@ export default function ProductDetail() {
                 </div>
                 <div className="container mx-auto px-4 py-8">
                     <ProductDetailSkeleton />
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-red-500 mb-4">Không thể tải thông tin sản phẩm.</p>
+                    <button onClick={() => window.location.reload()} className="text-blue-600 hover:underline">
+                        Thử lại
+                    </button>
                 </div>
             </div>
         );

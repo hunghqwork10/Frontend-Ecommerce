@@ -21,7 +21,7 @@ export default function ProductList() {
   const [sortBy, setSortBy] = useState<string>('newest');
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['products', filter, sortBy, currentPage],
     queryFn: () =>
       productService.getProducts({
@@ -81,6 +81,16 @@ export default function ProductList() {
                 {Array.from({ length: 6 }).map((_, i) => (
                   <ProductCardSkeleton key={`skel-${i}`} />
                 ))}
+              </div>
+            ) : error ? (
+              <div className="text-center py-12">
+                <p className="text-red-500 mb-4">Không thể tải danh sách sản phẩm.</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="text-blue-600 hover:underline"
+                >
+                  Thử lại
+                </button>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
