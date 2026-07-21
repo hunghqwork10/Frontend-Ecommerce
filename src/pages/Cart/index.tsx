@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import CartItem from '@/components/common/CartItem';
@@ -9,6 +10,7 @@ import { cartService } from '@/services';
 export default function Cart() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [couponError, setCouponError] = useState<string | null>(null);
 
   const { data: cart, isLoading, error } = useQuery({
     queryKey: ['cart'],
@@ -25,6 +27,18 @@ export default function Cart() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['cart'] }),
   });
 
+  const couponMutation = useMutation({
+    mutationFn: cartService.applyCoupon,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cart'] });
+      setCouponError(null);
+    },
+    onError: (err: Error) => {
+      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Mã giảm giá không hợp lệ';
+      setCouponError(message);
+    },
+  });
+
   const handleUpdateQuantity = (productId: string, quantity: number) => {
     const item = cart?.items.find((i) => i.product.id === productId);
     if (item) {
@@ -37,6 +51,18 @@ export default function Cart() {
     if (item) {
       removeMutation.mutate(item.id);
     }
+  };
+
+  const handleApplyCoupon = (code: string) => {
+    setCouponError(null);
+    couponMutation.mutate(code);
+  };
+
+  const handleRemoveCoupon = () => {
+    cartService.clearCart().then(() => {
+      queryClient.invalidateQueries({ queryKey: ['cart'] });
+      setCouponError(null);
+    });
   };
 
   const handleCheckout = () => {
@@ -134,7 +160,12 @@ export default function Cart() {
               shipping={cart.finalAmount > 5000000 ? 0 : 30000}
               discount={cart.discountAmount}
               total={cart.finalAmount}
+              couponCode={cart.couponCode}
               onCheckout={handleCheckout}
+              onApplyCoupon={handleApplyCoupon}
+              onRemoveCoupon={cart.couponCode ? handleRemoveCoupon : undefined}
+              isCouponLoading={couponMutation.isPending}
+              couponError={couponError}
             />
           </div>
         </div>
