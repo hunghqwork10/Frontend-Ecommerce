@@ -1,17 +1,19 @@
-import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { Mail, Lock } from 'lucide-react';
 import Button from '@/components/common/Button';
 import { authService } from '@/services';
 import { useUserStore } from '@/stores/userStore';
+import { loginSchema, type LoginFormData } from '@/utils/schemas';
 
 export default function Login() {
   const navigate = useNavigate();
   const { setToken, setUser } = useUserStore();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const { register, handleSubmit, setError, formState: { errors } } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
 
   const loginMutation = useMutation({
     mutationFn: authService.login,
@@ -21,14 +23,12 @@ export default function Login() {
       navigate('/');
     },
     onError: (err: { response?: { data?: { message?: string } } }) => {
-      setError(err.response?.data?.message || 'Đăng nhập thất bại');
+      setError('root', { message: err.response?.data?.message || 'Đăng nhập thất bại' });
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    loginMutation.mutate({ email, password });
+  const onSubmit = (data: LoginFormData) => {
+    loginMutation.mutate(data);
   };
 
   return (
@@ -37,13 +37,13 @@ export default function Login() {
         <div className="bg-white rounded-lg shadow-md p-8">
           <h1 className="text-2xl font-bold text-center mb-6">Đăng nhập</h1>
 
-          {error && (
+          {errors.root && (
             <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg mb-4 text-sm">
-              {error}
+              {errors.root.message}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Email
@@ -52,13 +52,14 @@ export default function Login() {
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
+                  {...register('email')}
                   className="w-full border rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="user@example.com"
                 />
               </div>
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+              )}
             </div>
 
             <div>
@@ -69,13 +70,14 @@ export default function Login() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
+                  {...register('password')}
                   className="w-full border rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="••••••"
                 />
               </div>
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
+              )}
             </div>
 
             <Button

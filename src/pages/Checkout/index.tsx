@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import CheckoutForm from '@/components/common/CheckoutForm';
@@ -6,9 +6,11 @@ import PaymentMethod from '@/components/common/PaymentMethod';
 import OrderSummary from '@/components/common/OrderSummary';
 import Button from '@/components/common/Button';
 import { cartService, orderService } from '@/services';
+import type { CheckoutFormRef } from '@/components/common/CheckoutForm';
 
 export default function Checkout() {
   const navigate = useNavigate();
+  const formRef = useRef<CheckoutFormRef>(null);
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'card' | 'wallet'>('cod');
 
   const { data: cart } = useQuery({
@@ -42,7 +44,6 @@ export default function Checkout() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-4">
           <h1 className="text-2xl font-bold">Thanh toán</h1>
@@ -51,13 +52,11 @@ export default function Checkout() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Forms */}
           <div className="lg:col-span-2 space-y-8">
-            <CheckoutForm onSubmit={handleFormSubmit} />
+            <CheckoutForm ref={formRef} onSubmit={handleFormSubmit} />
             <PaymentMethod selected={paymentMethod} onChange={setPaymentMethod} />
           </div>
 
-          {/* Right Column - Order Summary */}
           <div className="lg:col-span-1">
             <OrderSummary
               items={items}
@@ -71,10 +70,7 @@ export default function Checkout() {
               size="lg"
               className="w-full mt-6"
               isLoading={createOrderMutation.isPending}
-              onClick={() => {
-                const form = document.querySelector('form');
-                if (form) form.requestSubmit();
-              }}
+              onClick={() => formRef.current?.submit()}
             >
               Đặt hàng
             </Button>

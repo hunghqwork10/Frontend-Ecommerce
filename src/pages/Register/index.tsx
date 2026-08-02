@@ -1,20 +1,19 @@
-import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { Mail, Lock, User, Phone } from 'lucide-react';
 import Button from '@/components/common/Button';
 import { authService } from '@/services';
 import { useUserStore } from '@/stores/userStore';
+import { registerSchema, type RegisterFormData } from '@/utils/schemas';
 
 export default function Register() {
   const navigate = useNavigate();
   const { setToken, setUser } = useUserStore();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const { register, handleSubmit, setError, formState: { errors } } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+  });
 
   const registerMutation = useMutation({
     mutationFn: authService.register,
@@ -24,20 +23,12 @@ export default function Register() {
       navigate('/');
     },
     onError: (err: { response?: { data?: { message?: string } } }) => {
-      setError(err.response?.data?.message || 'Đăng ký thất bại');
+      setError('root', { message: err.response?.data?.message || 'Đăng ký thất bại' });
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (password !== confirmPassword) {
-      setError('Mật khẩu xác nhận không khớp');
-      return;
-    }
-
-    registerMutation.mutate({ name, email, phone, password, confirmPassword });
+  const onSubmit = (data: RegisterFormData) => {
+    registerMutation.mutate(data);
   };
 
   return (
@@ -46,13 +37,13 @@ export default function Register() {
         <div className="bg-white rounded-lg shadow-md p-8">
           <h1 className="text-2xl font-bold text-center mb-6">Đăng ký</h1>
 
-          {error && (
+          {errors.root && (
             <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg mb-4 text-sm">
-              {error}
+              {errors.root.message}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Họ và tên
@@ -61,13 +52,14 @@ export default function Register() {
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
+                  {...register('name')}
                   className="w-full border rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Nguyễn Văn A"
                 />
               </div>
+              {errors.name && (
+                <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
+              )}
             </div>
 
             <div>
@@ -78,13 +70,14 @@ export default function Register() {
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
+                  {...register('email')}
                   className="w-full border rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="email@example.com"
                 />
               </div>
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+              )}
             </div>
 
             <div>
@@ -95,13 +88,14 @@ export default function Register() {
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  required
+                  {...register('phone')}
                   className="w-full border rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="0901234567"
                 />
               </div>
+              {errors.phone && (
+                <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>
+              )}
             </div>
 
             <div>
@@ -112,13 +106,14 @@ export default function Register() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
+                  {...register('password')}
                   className="w-full border rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="••••••"
                 />
               </div>
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
+              )}
             </div>
 
             <div>
@@ -129,13 +124,14 @@ export default function Register() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
+                  {...register('confirmPassword')}
                   className="w-full border rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="••••••"
                 />
               </div>
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>
+              )}
             </div>
 
             <Button

@@ -1,46 +1,32 @@
-import { useState } from 'react';
+import { forwardRef, useImperativeHandle, useCallback } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { checkoutSchema, type CheckoutFormData } from '@/utils/schemas';
+
+export interface CheckoutFormRef {
+  submit: () => void;
+}
 
 interface CheckoutFormProps {
-  onSubmit: (data: CheckoutFormData) => void;
+  onSubmit: () => void;
 }
 
-export interface CheckoutFormData {
-  fullName: string;
-  phone: string;
-  email: string;
-  address: string;
-  city: string;
-  district: string;
-  ward: string;
-  note?: string;
-}
-
-export default function CheckoutForm({ onSubmit }: CheckoutFormProps) {
-  const [formData, setFormData] = useState<CheckoutFormData>({
-    fullName: '',
-    phone: '',
-    email: '',
-    address: '',
-    city: '',
-    district: '',
-    ward: '',
-    note: '',
+const CheckoutForm = forwardRef<CheckoutFormRef, CheckoutFormProps>(function CheckoutForm({ onSubmit }, ref) {
+  const { register, handleSubmit, formState: { errors } } = useForm<CheckoutFormData>({
+    resolver: zodResolver(checkoutSchema),
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
+  const submitForm = useCallback(
+    () => handleSubmit(onSubmit)(),
+    [handleSubmit, onSubmit],
+  );
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
+  useImperativeHandle(ref, () => ({
+    submit: submitForm,
+  }));
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <h2 className="text-xl font-bold mb-4">Thông tin giao hàng</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -50,13 +36,13 @@ export default function CheckoutForm({ onSubmit }: CheckoutFormProps) {
           </label>
           <input
             type="text"
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleChange}
-            required
+            {...register('fullName')}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Nguyễn Văn A"
           />
+          {errors.fullName && (
+            <p className="text-red-500 text-xs mt-1">{errors.fullName.message}</p>
+          )}
         </div>
 
         <div>
@@ -65,13 +51,13 @@ export default function CheckoutForm({ onSubmit }: CheckoutFormProps) {
           </label>
           <input
             type="tel"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            required
+            {...register('phone')}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="0901234567"
           />
+          {errors.phone && (
+            <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>
+          )}
         </div>
       </div>
 
@@ -81,13 +67,13 @@ export default function CheckoutForm({ onSubmit }: CheckoutFormProps) {
         </label>
         <input
           type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          required
+          {...register('email')}
           className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="email@example.com"
         />
+        {errors.email && (
+          <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+        )}
       </div>
 
       <div>
@@ -96,13 +82,13 @@ export default function CheckoutForm({ onSubmit }: CheckoutFormProps) {
         </label>
         <input
           type="text"
-          name="address"
-          value={formData.address}
-          onChange={handleChange}
-          required
+          {...register('address')}
           className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Số nhà, tên đường"
         />
+        {errors.address && (
+          <p className="text-red-500 text-xs mt-1">{errors.address.message}</p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -112,13 +98,13 @@ export default function CheckoutForm({ onSubmit }: CheckoutFormProps) {
           </label>
           <input
             type="text"
-            name="city"
-            value={formData.city}
-            onChange={handleChange}
-            required
+            {...register('city')}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Hà Nội"
           />
+          {errors.city && (
+            <p className="text-red-500 text-xs mt-1">{errors.city.message}</p>
+          )}
         </div>
 
         <div>
@@ -127,13 +113,13 @@ export default function CheckoutForm({ onSubmit }: CheckoutFormProps) {
           </label>
           <input
             type="text"
-            name="district"
-            value={formData.district}
-            onChange={handleChange}
-            required
+            {...register('district')}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Cầu Giấy"
           />
+          {errors.district && (
+            <p className="text-red-500 text-xs mt-1">{errors.district.message}</p>
+          )}
         </div>
 
         <div>
@@ -142,13 +128,13 @@ export default function CheckoutForm({ onSubmit }: CheckoutFormProps) {
           </label>
           <input
             type="text"
-            name="ward"
-            value={formData.ward}
-            onChange={handleChange}
-            required
+            {...register('ward')}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Dịch Vọng"
           />
+          {errors.ward && (
+            <p className="text-red-500 text-xs mt-1">{errors.ward.message}</p>
+          )}
         </div>
       </div>
 
@@ -157,9 +143,7 @@ export default function CheckoutForm({ onSubmit }: CheckoutFormProps) {
           Ghi chú
         </label>
         <textarea
-          name="note"
-          value={formData.note}
-          onChange={handleChange}
+          {...register('note')}
           rows={3}
           className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Ghi chú cho đơn hàng (tùy chọn)"
@@ -167,4 +151,6 @@ export default function CheckoutForm({ onSubmit }: CheckoutFormProps) {
       </div>
     </form>
   );
-}
+});
+
+export default CheckoutForm;
