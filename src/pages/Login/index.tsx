@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -8,8 +8,15 @@ import { authService } from '@/services';
 import { useUserStore } from '@/stores/userStore';
 import { loginSchema, type LoginFormData } from '@/utils/schemas';
 
+interface LoginLocationState {
+  from?: { pathname: string };
+}
+
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state as LoginLocationState | null;
+  const redirectTo = state?.from?.pathname ?? '/';
   const { setToken, setUser } = useUserStore();
   const { register, handleSubmit, setError, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -20,7 +27,7 @@ export default function Login() {
     onSuccess: (data) => {
       setToken(data.token);
       setUser(data.user);
-      navigate('/');
+      navigate(redirectTo, { replace: true });
     },
     onError: (err: { response?: { data?: { message?: string } } }) => {
       setError('root', { message: err.response?.data?.message || 'Đăng nhập thất bại' });

@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import Home from "@/pages/Home";
 import ProductList from "@/pages/ProductList";
 import ProductDetail from "@/pages/ProductDetail";
@@ -24,15 +25,25 @@ export const router = createBrowserRouter([
       { path: "accessories", element: <ProductList /> },
       { path: "sale", element: <ProductList /> },
       { path: "product/:id", element: <ProductDetail /> },
-      { path: "cart", element: <Cart /> },
-      { path: "checkout", element: <Checkout /> },
-      { path: "orders", element: <OrderHistory /> },
-      { path: "orders/:id", element: <OrderDetail /> },
+      {
+        element: <ProtectedRoute />,
+        children: [
+          { path: "cart", element: <Cart /> },
+          { path: "checkout", element: <Checkout /> },
+          { path: "orders", element: <OrderHistory /> },
+          { path: "orders/:id", element: <OrderDetail /> },
+        ],
+      },
     ],
   },
   {
-    path: "/order-success",
-    element: <OrderSuccess />,
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: "/order-success",
+        element: <OrderSuccess />,
+      },
+    ],
   },
   { path: "/login", element: <Login /> },
   { path: "/register", element: <Register /> },
