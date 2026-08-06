@@ -11,6 +11,7 @@ import OrderHistory from "@/pages/OrderHistory";
 import OrderDetail from "@/pages/OrderDetail";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import NotFound from "@/pages/NotFound";
 
 export const router = createBrowserRouter([
   {
@@ -34,6 +35,7 @@ export const router = createBrowserRouter([
           { path: "orders/:id", element: <OrderDetail /> },
         ],
       },
+      { path: "*", element: <NotFound /> },
     ],
   },
   {
